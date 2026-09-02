@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: #2f433a;
+  --color-accent: #f8c93c;
+  --color-light: #f5f3ed;
+  --color-text: #f4f2ed;
+  --color-muted: #c5cbc7;
+
+  --container: 1440px;
+  --page-gutter: 22px;
+
+  --ease-luxury: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  overflow-x: hidden;
+  background: var(--color-primary);
+  color: var(--color-text);
+  font-family: "Manrope", Arial, sans-serif;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}

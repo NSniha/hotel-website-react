@@ -1,0 +1,191 @@
+@import "tailwindcss";
+
+/* ================================
+   BankHotel Design System
+================================ */
+
+:root {
+  --hotel-green: #313f38;
+  --hotel-yellow: #fcd043;
+  --hotel-white: #fffcf6;
+  --hotel-muted: #d7d9d5;
+
+  --font-heading: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-body: "Manrope", Arial, Helvetica, sans-serif;
+
+  --container-width: 1920px;
+  --ease-hotel: cubic-bezier(0.16, 1, 0.3, 1);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ================================
+   Global Reset
+================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+  background: var(--hotel-green);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+
+  background: var(--hotel-green);
+  color: var(--hotel-white);
+
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading);
+  font-weight: 400;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+img,
+svg,
+picture,
+video {
+  display: block;
+}
+
+img,
+video {
+  max-width: 100%;
+}
+
+/* ================================
+   Typography Utilities
+================================ */
+
+.font-editorial {
+  font-family: var(--font-heading);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+/* ================================
+   Selection
+================================ */
+
+::selection {
+  background: var(--hotel-yellow);
+  color: var(--hotel-green);
+}
+
+/* ================================
+   Accessibility
+================================ */
+
+:focus-visible {
+  outline: 1px solid var(--hotel-yellow);
+  outline-offset: 4px;
+}
+
+/* ================================
+   Scrollbar
+================================ */
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--hotel-green);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(252, 208, 67, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--hotel-yellow);
+}
+
+/* ================================
+   Date Inputs
+================================ */
+
+input[type="date"] {
+  color-scheme: dark;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+/* ================================
+   Reduced Motion
+================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
