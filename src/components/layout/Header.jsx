@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import starIcon from "../../assets/icons/star.svg";
 
@@ -14,6 +14,7 @@ const navigation = [
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -23,15 +24,19 @@ const Header = () => {
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
   return (
     <>
       {/* Main Header */}
-      <header className="relative z-50 bg-[#2f433a]">
-        <div className="mx-auto flex h-[76px] w-full max-w-[1920px] items-center justify-between px-[10px] sm:px-[22px] lg:h-[96px] lg:px-[30px]">
+      <header className="relative z-50 bg-[#313F38]">
+        <div className="mx-auto flex h-[68px] w-full max-w-[1920px] items-center justify-between px-[10px] sm:px-[22px] lg:h-[92px] lg:px-[30px]">
           <Link
             to="/"
             aria-label="BankHotel homepage"
-            className="relative z-50 shrink-0 text-[16px] font-semibold tracking-[-0.035em] text-[#f7f5ef] transition-colors duration-300 hover:text-[#f8cd42] lg:text-[17px] 2xl:text-[18px]"
+            className="relative z-50 shrink-0 text-[15px] font-semibold tracking-[-0.04em] text-[#FFFCF6] transition-colors duration-300 hover:text-[#FCD043] sm:text-[16px] lg:text-[17px]"
           >
             BankHotel
           </Link>
@@ -39,24 +44,28 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav
             aria-label="Primary navigation"
-            className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-[44px] xl:flex 2xl:gap-[62px]"
+            className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-[43px] xl:flex 2xl:gap-[61px]"
           >
             {navigation.map((item) => (
               <Link
                 key={item.label}
                 to={item.path}
-                className="group relative whitespace-nowrap text-[13px] font-medium tracking-[-0.025em] text-[#f5f3ed] transition-colors duration-300 hover:text-[#f8cd42] 2xl:text-[14px]"
+                className="group relative whitespace-nowrap text-[13px] font-medium tracking-[-0.03em] text-[#FFFCF6] transition-colors duration-300 hover:text-[#FCD043] 2xl:text-[14px]"
               >
                 {item.label}
 
-                <span className="absolute -bottom-[8px] left-0 h-px w-0 bg-[#f8cd42] transition-all duration-300 group-hover:w-full" />
+                <span className="absolute -bottom-[7px] left-0 h-px w-0 bg-[#FCD043] transition-[width] duration-300 group-hover:w-full" />
               </Link>
             ))}
           </nav>
 
+          {/* Desktop Phone */}
           <a
             href="tel:+380322975020"
-            className="hidden whitespace-nowrap text-[14px] font-medium tracking-[-0.02em] text-[#f5f3ed] transition-colors duration-300 hover:text-[#f8cd42] xl:block 2xl:text-[15px]"
+            className="hidden whitespace-nowrap text-[14px] font-medium tracking-[-0.025em] transition-opacity duration-300 hover:opacity-70 xl:block 2xl:text-[15px]"
+            style={{
+              color: "#FCD043",
+            }}
           >
             +38 032 297 50 20
           </a>
@@ -68,10 +77,10 @@ const Header = () => {
             aria-expanded={menuOpen}
             aria-controls="mobile-navigation"
             onClick={() => setMenuOpen(true)}
-            className="relative z-50 flex h-[42px] w-[42px] flex-col items-center justify-center gap-[7px] xl:hidden"
+            className="relative z-50 flex h-[36px] w-[36px] flex-col items-end justify-center gap-[6px] xl:hidden"
           >
-            <span className="h-px w-[36px] bg-[#f5f3ed]" />
-            <span className="h-px w-[36px] bg-[#f5f3ed]" />
+            <span className="h-px w-[29px] bg-[#FFFCF6]" />
+            <span className="h-px w-[29px] bg-[#FFFCF6]" />
           </button>
         </div>
       </header>
@@ -80,19 +89,19 @@ const Header = () => {
       <aside
         id="mobile-navigation"
         aria-hidden={!menuOpen}
-        className={`fixed inset-0 z-[100] overflow-y-auto bg-[#2f433a] transition-[opacity,transform] duration-500 ease-out xl:hidden ${
+        className={`fixed inset-0 z-[250] overflow-y-auto bg-[#313F38] transition-[opacity,transform] duration-500 ease-out xl:hidden ${
           menuOpen
             ? "pointer-events-auto translate-x-0 opacity-100"
             : "pointer-events-none translate-x-full opacity-0"
         }`}
       >
-        <div className="flex min-h-[100svh] flex-col px-[10px] pb-[22px] pt-[25px]">
-          {/* Mobile Menu Header */}
+        <div className="flex min-h-[100svh] flex-col px-[10px] pb-[22px] pt-[27px]">
+          {/* Mobile Header */}
           <div className="flex items-start justify-between">
             <Link
               to="/"
               onClick={() => setMenuOpen(false)}
-              className="text-[16px] font-semibold tracking-[-0.04em] text-[#f5f3ed]"
+              className="text-[15px] font-semibold tracking-[-0.04em] text-[#FFFCF6]"
             >
               BankHotel
             </Link>
@@ -101,25 +110,25 @@ const Header = () => {
               type="button"
               aria-label="Close navigation menu"
               onClick={() => setMenuOpen(false)}
-              className="relative h-[34px] w-[34px]"
+              className="relative -mt-[4px] h-[34px] w-[34px]"
             >
-              <span className="absolute left-1/2 top-1/2 h-px w-[40px] -translate-x-1/2 -translate-y-1/2 rotate-45 bg-[#f5f3ed]" />
+              <span className="absolute left-1/2 top-1/2 h-px w-[30px] -translate-x-1/2 -translate-y-1/2 rotate-45 bg-[#FFFCF6]" />
 
-              <span className="absolute left-1/2 top-1/2 h-px w-[40px] -translate-x-1/2 -translate-y-1/2 -rotate-45 bg-[#f5f3ed]" />
+              <span className="absolute left-1/2 top-1/2 h-px w-[30px] -translate-x-1/2 -translate-y-1/2 -rotate-45 bg-[#FFFCF6]" />
             </button>
           </div>
 
-          {/* Mobile Menu Links */}
+          {/* Mobile Navigation Links */}
           <nav
             aria-label="Mobile navigation"
-            className="mt-[70px] flex flex-col items-start gap-[32px]"
+            className="mt-[70px] flex flex-col items-start gap-[30px]"
           >
             {navigation.map((item, index) => (
               <Link
                 key={item.label}
                 to={item.path}
                 onClick={() => setMenuOpen(false)}
-                className="group flex items-center gap-[14px] text-[29px] font-normal uppercase leading-none tracking-[-0.045em] text-[#f5f3ed] transition-colors duration-300 hover:text-[#f8cd42]"
+                className="flex items-center gap-[13px] text-[18px] font-normal uppercase leading-none tracking-[-0.045em] text-[#FFFCF6] transition-colors duration-300 hover:text-[#FCD043] sm:text-[27px]"
               >
                 <span>{item.label}</span>
 
@@ -128,7 +137,7 @@ const Header = () => {
                     src={starIcon}
                     alt=""
                     aria-hidden="true"
-                    className="h-[36px] w-[36px] object-contain"
+                    className="h-[30px] w-[30px] shrink-0 object-contain"
                   />
                 )}
               </Link>
@@ -136,34 +145,38 @@ const Header = () => {
           </nav>
 
           {/* Mobile Contact Information */}
-          <div className="mt-auto pt-[90px]">
-            <div className="flex justify-center">
+          <div className="mt-auto pt-[95px]">
+            <div className="text-center">
               <a
                 href="tel:+380322975020"
-                className="border-b border-white/30 pb-[3px] text-[20px] tracking-[-0.035em] text-[#f5f3ed]"
+                className="inline-block border-b pb-[3px] text-[18px] tracking-[-0.04em]"
+                style={{
+                  color: "#FCD043",
+                  borderColor: "rgba(252, 208, 67, 0.55)",
+                }}
               >
                 +38 032 297 50 20
               </a>
             </div>
 
-            <div className="mt-[42px] text-center">
+            <div className="mt-[38px] text-center">
               <a
                 href="https://www.google.com/maps/search/?api=1&query=8+Lystopadovoho+Chynu+Lviv"
                 target="_blank"
                 rel="noreferrer"
-                className="text-[16px] uppercase tracking-[-0.035em] text-[#f5f3ed]"
+                className="text-[14px] uppercase tracking-[-0.04em] text-[#FFFCF6]"
               >
                 8 Lystopadovoho Chynu,Lviv
               </a>
             </div>
 
-            {/* Mobile Social Links */}
-            <div className="mt-[47px] grid grid-cols-3 gap-[24px] px-[42px]">
+            {/* Social Links */}
+            <div className="mx-auto mt-[43px] grid max-w-[270px] grid-cols-3 gap-[34px]">
               {["Facebook", "Instagram", "Twitter"].map((social) => (
                 <a
                   key={social}
                   href={`#${social.toLowerCase()}`}
-                  className="border-b border-white/25 pb-[7px] text-center text-[11px] font-medium uppercase transition-colors duration-300 hover:border-[#f8cd42] hover:text-[#f8cd42]"
+                  className="border-b border-white/25 pb-[7px] text-center text-[10px] font-medium uppercase transition-colors duration-300 hover:border-[#FCD043] hover:text-[#FCD043]"
                 >
                   {social}
                 </a>

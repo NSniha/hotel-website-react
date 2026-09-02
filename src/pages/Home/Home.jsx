@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 
 import Header from "../../components/layout/Header.jsx";
@@ -7,7 +7,11 @@ import bankHotelLogo from "../../assets/logos/bank-hotel-logo.svg";
 import heroRoom from "../../assets/images/home/hero-room.png";
 import starIcon from "../../assets/icons/star.svg";
 
-const MONTHS = [
+const BODY_FONT = '"Manrope", Arial, Helvetica, sans-serif';
+const HEADING_FONT =
+  '"Cormorant Garamond", Georgia, "Times New Roman", serif';
+
+const months = [
   "January",
   "February",
   "March",
@@ -22,12 +26,12 @@ const MONTHS = [
   "December",
 ];
 
-const WEEKDAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+const weekDays = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
 
-const toDateKey = (date) => {
+const getDateKey = (date) => {
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
 
   return `${year}-${month}-${day}`;
 };
@@ -42,52 +46,86 @@ const formatDate = (date) => {
   }).format(new Date(`${date}T00:00:00`));
 };
 
-const BookingCalendar = ({
+/* Brand Logo */
+const BrandLogo = () => {
+  return (
+    <div className="relative mx-auto w-full max-w-[355px] sm:max-w-[620px] lg:mx-0 lg:max-w-[940px]">
+      <img
+        src={bankHotelLogo}
+        alt="BankHotel"
+        className="block h-auto w-full"
+      />
+
+      {/* Yellow Hotel Overlay */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+        style={{
+          clipPath: "inset(0 0 0 49.5%)",
+        }}
+      >
+        <img
+          src={bankHotelLogo}
+          alt=""
+          className="absolute inset-0 h-full w-full object-contain object-left"
+          style={{
+            filter:
+              "brightness(0) saturate(100%) invert(85%) sepia(87%) saturate(1193%) hue-rotate(326deg) brightness(103%) contrast(98%)",
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+/* Booking Calendar */
+const Calendar = ({
+  title,
   selectedDate,
-  minDate,
+  minimumDate,
   onSelect,
   onClose,
-  title,
 }) => {
   const initialDate = selectedDate
     ? new Date(`${selectedDate}T00:00:00`)
-    : new Date();
+    : minimumDate
+      ? new Date(`${minimumDate}T00:00:00`)
+      : new Date();
 
-  const [viewDate, setViewDate] = useState(
+  const [visibleMonth, setVisibleMonth] = useState(
     new Date(initialDate.getFullYear(), initialDate.getMonth(), 1),
   );
 
-  const calendarDays = useMemo(() => {
-    const year = viewDate.getFullYear();
-    const month = viewDate.getMonth();
+  const days = useMemo(() => {
+    const year = visibleMonth.getFullYear();
+    const month = visibleMonth.getMonth();
 
     const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
+    const finalDay = new Date(year, month + 1, 0);
 
-    const startOffset = (firstDay.getDay() + 6) % 7;
+    const offset = (firstDay.getDay() + 6) % 7;
+    const calendar = [];
 
-    const result = [];
-
-    for (let index = 0; index < startOffset; index += 1) {
-      result.push(null);
+    for (let index = 0; index < offset; index += 1) {
+      calendar.push(null);
     }
 
-    for (let day = 1; day <= lastDay.getDate(); day += 1) {
-      result.push(new Date(year, month, day));
+    for (let day = 1; day <= finalDay.getDate(); day += 1) {
+      calendar.push(new Date(year, month, day));
     }
 
-    return result;
-  }, [viewDate]);
+    return calendar;
+  }, [visibleMonth]);
 
   const previousMonth = () => {
-    setViewDate(
+    setVisibleMonth(
       (current) =>
         new Date(current.getFullYear(), current.getMonth() - 1, 1),
     );
   };
 
   const nextMonth = () => {
-    setViewDate(
+    setVisibleMonth(
       (current) =>
         new Date(current.getFullYear(), current.getMonth() + 1, 1),
     );
@@ -95,21 +133,41 @@ const BookingCalendar = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 8, scale: 0.98 }}
-      transition={{ duration: 0.25 }}
-      className="w-full max-w-[350px] border border-white/15 bg-[#34483f] p-[20px] shadow-2xl backdrop-blur-xl"
+      initial={{
+        opacity: 0,
+        y: 14,
+        scale: 0.98,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+        scale: 1,
+      }}
+      exit={{
+        opacity: 0,
+        y: 8,
+        scale: 0.98,
+      }}
+      transition={{
+        duration: 0.28,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      className="w-full max-w-[390px] border border-white/15 bg-[#394B42] p-[22px] shadow-[0_30px_90px_rgba(0,0,0,0.38)] sm:w-[390px]"
+      style={{
+        fontFamily: BODY_FONT,
+      }}
     >
       {/* Calendar Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div>
-          <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#f8cd42]">
+          <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#FCD043]">
             {title}
           </span>
 
-          <h3 className="mt-[5px] text-[19px] font-medium text-[#f5f3ed]">
-            {MONTHS[viewDate.getMonth()]} {viewDate.getFullYear()}
+          <h3 className="mt-[6px] text-[17px] font-medium leading-none text-[#FFFCF6]" style={{
+            fontFamily: BODY_FONT,
+          }}>
+            {months[visibleMonth.getMonth()]} {visibleMonth.getFullYear()}
           </h3>
         </div>
 
@@ -117,41 +175,43 @@ const BookingCalendar = ({
           type="button"
           onClick={onClose}
           aria-label="Close calendar"
-          className="flex h-[34px] w-[34px] items-center justify-center border border-white/15 text-[18px] text-white/70 transition-colors hover:border-[#f8cd42] hover:text-[#f8cd42]"
+          className="flex h-[36px] w-[36px] items-center justify-center border border-white/15 text-[19px] font-light text-white/65 transition-colors duration-300 hover:border-[#FCD043] hover:text-[#FCD043]"
         >
           ×
         </button>
       </div>
 
-      {/* Calendar Controls */}
-      <div className="mt-[20px] flex items-center justify-between">
+      {/* Month Navigation */}
+      <div className="mt-[22px] flex items-center justify-between">
         <button
           type="button"
           onClick={previousMonth}
-          className="flex h-[34px] w-[34px] items-center justify-center border border-white/15 text-white/70 transition-colors hover:border-[#f8cd42] hover:text-[#f8cd42]"
+          aria-label="Previous month"
+          className="flex h-[36px] w-[36px] items-center justify-center border border-white/15 text-[15px] text-white/70 transition-colors duration-300 hover:border-[#FCD043] hover:text-[#FCD043]"
         >
           ←
         </button>
 
-        <span className="text-[12px] uppercase tracking-[0.08em] text-white/60">
-          Select a date
+        <span className="text-[10px] font-medium uppercase tracking-[0.13em] text-white/45">
+          Select date
         </span>
 
         <button
           type="button"
           onClick={nextMonth}
-          className="flex h-[34px] w-[34px] items-center justify-center border border-white/15 text-white/70 transition-colors hover:border-[#f8cd42] hover:text-[#f8cd42]"
+          aria-label="Next month"
+          className="flex h-[36px] w-[36px] items-center justify-center border border-white/15 text-[15px] text-white/70 transition-colors duration-300 hover:border-[#FCD043] hover:text-[#FCD043]"
         >
           →
         </button>
       </div>
 
-      {/* Weekdays */}
+      {/* Week Days */}
       <div className="mt-[20px] grid grid-cols-7 gap-[4px]">
-        {WEEKDAYS.map((day) => (
+        {weekDays.map((day) => (
           <span
             key={day}
-            className="flex h-[30px] items-center justify-center text-[10px] uppercase text-white/40"
+            className="flex h-[30px] items-center justify-center text-[9px] font-semibold tracking-[0.06em] text-white/35"
           >
             {day}
           </span>
@@ -160,28 +220,27 @@ const BookingCalendar = ({
 
       {/* Calendar Days */}
       <div className="grid grid-cols-7 gap-[4px]">
-        {calendarDays.map((date, index) => {
+        {days.map((date, index) => {
           if (!date) {
-            return <span key={`empty-${index}`} className="h-[38px]" />;
+            return <span key={`empty-${index}`} className="h-[42px]" />;
           }
 
-          const key = toDateKey(date);
-
-          const disabled = minDate ? key < minDate : false;
-          const selected = selectedDate === key;
+          const dateKey = getDateKey(date);
+          const disabled = minimumDate && dateKey < minimumDate;
+          const selected = selectedDate === dateKey;
 
           return (
             <button
-              key={key}
+              key={dateKey}
               type="button"
               disabled={disabled}
-              onClick={() => onSelect(key)}
-              className={`flex h-[38px] items-center justify-center text-[12px] transition-all ${
+              onClick={() => onSelect(dateKey)}
+              className={`flex h-[42px] items-center justify-center text-[12px] font-medium transition-all duration-200 ${
                 selected
-                  ? "bg-[#f8cd42] font-semibold text-[#203129]"
+                  ? "bg-[#FCD043] text-[#24352D]"
                   : disabled
                     ? "cursor-not-allowed text-white/15"
-                    : "text-[#f5f3ed] hover:bg-white/10 hover:text-[#f8cd42]"
+                    : "text-[#FFFCF6] hover:bg-white/10 hover:text-[#FCD043]"
               }`}
             >
               {date.getDate()}
@@ -199,11 +258,27 @@ const Home = () => {
 
   const [activeCalendar, setActiveCalendar] = useState(null);
   const [mobileBookingOpen, setMobileBookingOpen] = useState(false);
-  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
 
-  const today = useMemo(() => toDateKey(new Date()), []);
+  const today = useMemo(() => getDateKey(new Date()), []);
 
-  const selectCheckIn = (date) => {
+  useEffect(() => {
+    if (checkIn && checkOut && checkOut <= checkIn) {
+      setCheckOut("");
+    }
+  }, [checkIn, checkOut]);
+
+  useEffect(() => {
+    const locked = mobileBookingOpen || confirmationOpen;
+
+    document.body.style.overflow = locked ? "hidden" : "";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileBookingOpen, confirmationOpen]);
+
+  const handleCheckIn = (date) => {
     setCheckIn(date);
 
     if (checkOut && checkOut <= date) {
@@ -213,14 +288,9 @@ const Home = () => {
     setActiveCalendar("checkOut");
   };
 
-  const selectCheckOut = (date) => {
+  const handleCheckOut = (date) => {
     setCheckOut(date);
     setActiveCalendar(null);
-  };
-
-  const openMobileBooking = () => {
-    setMobileBookingOpen(true);
-    setActiveCalendar(checkIn ? "checkOut" : "checkIn");
   };
 
   const handleBooking = () => {
@@ -236,34 +306,53 @@ const Home = () => {
 
     setActiveCalendar(null);
     setMobileBookingOpen(false);
-    setBookingSuccess(true);
+    setConfirmationOpen(true);
+  };
+
+  const openMobileBooking = () => {
+    setMobileBookingOpen(true);
+    setActiveCalendar(checkIn ? "checkOut" : "checkIn");
+  };
+
+  const closeMobileBooking = () => {
+    setMobileBookingOpen(false);
+    setActiveCalendar(null);
   };
 
   const scrollToHotel = () => {
     document
       .getElementById("hotel-preview")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      ?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
   };
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#2f433a] text-[#f5f3ed]">
+    <main className="min-h-screen overflow-hidden bg-[#313F38] text-[#FFFCF6]">
       {/* Homepage Hero */}
       <section
         id="home"
-        className="relative min-h-screen bg-[#2f433a] pb-[32px] lg:pb-[46px]"
+        className="relative min-h-screen bg-[#313F38] pb-[31px] sm:pb-[36px] lg:pb-[46px]"
         aria-labelledby="home-title"
       >
         <Header />
 
         <div className="mx-auto w-full max-w-[1920px] px-[10px] sm:px-[22px] lg:px-[30px]">
           {/* Hero Introduction */}
-          <div className="relative pt-[17px] sm:pt-[30px] lg:pt-[37px]">
+          <div className="relative pt-[13px] sm:pt-[28px] lg:pt-[42px]">
             <div className="grid gap-[45px] xl:grid-cols-[minmax(0,1.66fr)_minmax(310px,0.56fr)] xl:gap-[88px]">
               {/* Hero Branding */}
               <div>
                 <motion.div
-                  initial={{ opacity: 0, y: 22 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{
+                    opacity: 0,
+                    y: 24,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                  }}
                   transition={{
                     duration: 0.9,
                     ease: [0.16, 1, 0.3, 1],
@@ -273,36 +362,44 @@ const Home = () => {
                     BankHotel
                   </h1>
 
-                  <img
-                    src={bankHotelLogo}
-                    alt="BankHotel"
-                    className="mx-auto h-auto w-full max-w-[365px] object-contain sm:max-w-[600px] lg:mx-0 lg:max-w-[970px]"
-                  />
+                  <BrandLogo />
                 </motion.div>
 
-                {/* Service Categories */}
+                {/* Categories */}
                 <motion.p
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{
+                    opacity: 0,
+                    y: 15,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                  }}
                   transition={{
-                    duration: 0.7,
+                    duration: 0.75,
                     delay: 0.15,
                     ease: [0.16, 1, 0.3, 1],
                   }}
-                  className="mt-[29px] pt-[4px] text-center text-[11px] font-semibold uppercase leading-[1.45] tracking-[-0.035em] text-[#f8cd42] sm:text-[14px] lg:mt-[32px] lg:text-left lg:text-[20px]"
+                  className="pt-[25px] whitespace-nowrap text-center text-[10px] font-semibold uppercase leading-none tracking-[-0.04em] text-[#FCD043] min-[370px]:text-[11px] sm:text-[14px] lg:pt-[25px] lg:text-left lg:text-[17px]"
                 >
                   Rooms // Restaurant // Congress Hall // Wine Bar
                 </motion.p>
 
                 {/* Mobile Divider */}
-                <div className="mx-auto mt-[24px] h-px w-[172px] bg-white/10 lg:hidden" />
+                <div className="mx-auto mt-[26px] h-px w-[172px] bg-white/10 lg:hidden" />
               </div>
 
-              {/* Desktop Hero Information */}
-              <div className="relative hidden min-h-[220px] xl:block">
+              {/* Desktop Right Information */}
+              <div className="relative hidden min-h-[222px] xl:block">
                 <motion.div
-                  initial={{ opacity: 0, y: 18 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{
+                    opacity: 0,
+                    y: 18,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                  }}
                   transition={{
                     duration: 0.8,
                     delay: 0.18,
@@ -311,7 +408,7 @@ const Home = () => {
                   className="flex items-start justify-between gap-[35px]"
                 >
                   {/* Since Badge */}
-                  <div className="flex h-[54px] min-w-[190px] items-center rounded-full border border-white/25 px-[22px]">
+                  <div className="flex h-[54px] min-w-[188px] items-center rounded-full border border-white/25 px-[22px]">
                     <img
                       src={starIcon}
                       alt=""
@@ -319,12 +416,12 @@ const Home = () => {
                       className="mr-[15px] h-[25px] w-[25px] shrink-0"
                     />
 
-                    <span className="whitespace-nowrap text-[15px] tracking-[-0.025em]">
+                    <span className="whitespace-nowrap text-[15px] font-normal tracking-[-0.025em] text-[#FFFCF6]">
                       Since 1973
                     </span>
                   </div>
 
-                  {/* Scroll Geometry */}
+                  {/* Scroll Control */}
                   <button
                     type="button"
                     onClick={scrollToHotel}
@@ -334,7 +431,7 @@ const Home = () => {
                     <svg
                       viewBox="0 0 52 52"
                       aria-hidden="true"
-                      className="absolute inset-0 h-full w-full text-white/25 transition-colors group-hover:text-[#f8cd42]"
+                      className="absolute inset-0 h-full w-full text-white/25 transition-colors duration-300 group-hover:text-[#FCD043]"
                     >
                       <path
                         d="M26 1.5L42.7 8.4L50.5 26L42.7 43.6L26 50.5L9.3 43.6L1.5 26L9.3 8.4L26 1.5Z"
@@ -346,8 +443,8 @@ const Home = () => {
 
                     <svg
                       viewBox="0 0 20 20"
-                      className="relative h-[16px] w-[16px] text-[#f8cd42]"
                       aria-hidden="true"
+                      className="relative h-[16px] w-[16px] text-[#FCD043] transition-transform duration-300 group-hover:translate-y-[2px]"
                     >
                       <path
                         d="M4.5 7.5L10 13L15.5 7.5"
@@ -360,10 +457,17 @@ const Home = () => {
                 </motion.div>
 
                 <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.8, delay: 0.34 }}
-                  className="absolute bottom-0 left-0 max-w-[325px] text-[14px] leading-[1.55] text-[#d1d6d2]"
+                  initial={{
+                    opacity: 0,
+                  }}
+                  animate={{
+                    opacity: 1,
+                  }}
+                  transition={{
+                    duration: 0.8,
+                    delay: 0.34,
+                  }}
+                  className="absolute bottom-0 left-0 max-w-[310px] text-[13px] font-normal leading-[1.55] text-[#D6D6D0]"
                 >
                   The luxurious hotel in the most beautiful European city with
                   an exclusive restaurant, conference-hall, and art-bar.
@@ -373,66 +477,89 @@ const Home = () => {
           </div>
 
           {/* Mobile Description */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.7, delay: 0.25 }}
-            className="mx-auto mt-[24px] max-w-[300px] text-center text-[14px] leading-[1.65] text-[#d2d7d3] lg:hidden"
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 12,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.7,
+              delay: 0.24,
+              ease: [0.16, 1, 0.3, 1],
+            }}
+            className="mx-auto mt-[24px] max-w-[310px] text-center lg:hidden"
           >
-            The luxurious hotel in the most beautiful European city with an
-            exclusive restaurant, conference-hall, and art-bar.
-          </motion.p>
+            <p className="text-[14px] font-normal leading-[1.62] tracking-[-0.025em] text-[#D6D6D0]">
+              The luxurious hotel in the most beautiful European city with an
+              exclusive restaurant, conference-hall, and art-bar.
+            </p>
+          </motion.div>
 
-          {/* Hotel Image */}
+          {/* Hotel Preview */}
           <motion.div
             id="hotel-preview"
-            initial={{ opacity: 0, y: 26 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{
+              opacity: 0,
+              y: 28,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
             transition={{
               duration: 1,
               delay: 0.28,
               ease: [0.16, 1, 0.3, 1],
             }}
-            className="relative mt-[44px] lg:mt-[76px]"
+            className="relative mt-[44px] sm:mt-[55px] lg:mt-[76px]"
           >
-            <div className="relative overflow-visible lg:overflow-hidden">
+            <div className="relative overflow-hidden">
               <img
                 src={heroRoom}
                 alt="Luxury BankHotel room interior"
                 fetchPriority="high"
-                className="h-[425px] w-full object-cover object-center sm:h-[520px] lg:h-[625px] xl:h-[630px]"
+                className="h-[425px] w-full object-cover object-[56%_center] sm:h-[520px] sm:object-center lg:h-[625px] xl:h-[630px]"
               />
 
               {/* Desktop Booking Form */}
-              <div className="absolute right-0 top-0 z-20 hidden h-[118px] w-[59.5%] min-w-[760px] grid-cols-3 lg:grid">
+              <div className="absolute right-0 top-0 hidden h-[118px] w-[59.5%] min-w-[760px] grid-cols-3 lg:grid">
                 {/* Check In */}
                 <button
                   type="button"
                   onClick={() =>
                     setActiveCalendar(
-                      activeCalendar === "checkIn" ? null : "checkIn",
+                      activeCalendar === "checkIn"
+                        ? null
+                        : "checkIn",
                     )
                   }
-                  className={`relative flex h-full items-center justify-between border-r border-white/10 px-[38px] text-left backdrop-blur-[10px] transition-colors ${
-                    activeCalendar === "checkIn"
-                      ? "bg-[#788078]"
-                      : "bg-[rgba(103,112,106,0.9)] hover:bg-[#788078]"
-                  }`}
+                  className="relative flex h-full items-center justify-between border-r border-white/15 text-left backdrop-blur-[6px] transition-[filter] duration-300 hover:brightness-105"
+                  style={{
+                    backgroundColor: "rgb(0 0 0 / 41%)",
+                    paddingLeft: "42px",
+                    paddingRight: "34px",
+                  }}
                 >
-                  <div className="py-[10px]">
-                    <span className="block text-[12px] font-semibold uppercase text-white">
+                  <div>
+                    <span className="block text-[12px] font-medium uppercase text-[#FFFCF6]">
                       Check In
                     </span>
 
-                    <span className="mt-[7px] block min-h-[16px] text-[11px] text-white/65">
-                      {checkIn ? formatDate(checkIn) : "Select arrival date"}
+                    <span className="mt-[7px] block min-h-[15px] text-[11px] text-white/65">
+                      {checkIn
+                        ? formatDate(checkIn)
+                        : "Select arrival date"}
                     </span>
                   </div>
 
                   <svg
                     viewBox="0 0 20 20"
-                    className="h-[18px] w-[18px] text-[#f8cd42]"
                     aria-hidden="true"
+                    className="mr-[12px] h-[18px] w-[18px] shrink-0 text-[#FCD043]"
                   >
                     <path
                       d="M5 12L10 7L15 12"
@@ -448,29 +575,34 @@ const Home = () => {
                   type="button"
                   onClick={() =>
                     setActiveCalendar(
-                      activeCalendar === "checkOut" ? null : "checkOut",
+                      activeCalendar === "checkOut"
+                        ? null
+                        : "checkOut",
                     )
                   }
-                  className={`relative flex h-full items-center justify-between px-[38px] text-left backdrop-blur-[10px] transition-colors ${
-                    activeCalendar === "checkOut"
-                      ? "bg-[#555c53]"
-                      : "bg-[rgba(66,72,64,0.94)] hover:bg-[#555c53]"
-                  }`}
+                  className="relative flex h-full items-center justify-between text-left backdrop-blur-[6px] transition-[filter] duration-300 hover:brightness-105"
+                  style={{
+                    backgroundColor: "rgb(0 0 0 / 38%)",
+                    paddingLeft: "42px",
+                    paddingRight: "34px",
+                  }}
                 >
-                  <div className="py-[10px]">
-                    <span className="block text-[12px] font-semibold uppercase text-white">
+                  <div>
+                    <span className="block text-[12px] font-medium uppercase text-[#FFFCF6]">
                       Check Out
                     </span>
 
-                    <span className="mt-[7px] block min-h-[16px] text-[11px] text-white/65">
-                      {checkOut ? formatDate(checkOut) : "Select departure date"}
+                    <span className="mt-[7px] block min-h-[15px] text-[11px] text-white/65">
+                      {checkOut
+                        ? formatDate(checkOut)
+                        : "Select departure date"}
                     </span>
                   </div>
 
                   <svg
                     viewBox="0 0 20 20"
-                    className="h-[18px] w-[18px] text-[#f8cd42]"
                     aria-hidden="true"
+                    className="mr-[12px] h-[18px] w-[18px] shrink-0 text-[#FCD043]"
                   >
                     <path
                       d="M5 8L10 13L15 8"
@@ -481,57 +613,28 @@ const Home = () => {
                   </svg>
                 </button>
 
-                {/* Book Room */}
+                {/* Desktop Book Room */}
                 <button
                   type="button"
                   onClick={handleBooking}
-                  className="flex h-full items-center justify-center bg-[#f8cd42] text-[13px] font-semibold uppercase text-[#17231e] transition-colors hover:bg-[#ffdc5c]"
+                  className="flex h-full items-center justify-center text-[13px] font-semibold uppercase tracking-[-0.025em] transition-[filter] duration-300 hover:brightness-105"
+                  style={{
+                    backgroundColor: "#FCD043",
+                    color: "#17231E",
+                  }}
                 >
                   Book Room
                 </button>
               </div>
 
-              {/* Desktop Calendar */}
-              <AnimatePresence>
-                {activeCalendar && !mobileBookingOpen && (
-                  <div
-                    className={`absolute top-[132px] z-50 hidden lg:block ${
-                      activeCalendar === "checkIn"
-                        ? "right-[39.7%]"
-                        : "right-[19.8%]"
-                    }`}
-                  >
-                    <BookingCalendar
-                      title={
-                        activeCalendar === "checkIn"
-                          ? "Check In"
-                          : "Check Out"
-                      }
-                      selectedDate={
-                        activeCalendar === "checkIn" ? checkIn : checkOut
-                      }
-                      minDate={
-                        activeCalendar === "checkIn"
-                          ? today
-                          : checkIn || today
-                      }
-                      onSelect={
-                        activeCalendar === "checkIn"
-                          ? selectCheckIn
-                          : selectCheckOut
-                      }
-                      onClose={() => setActiveCalendar(null)}
-                    />
-                  </div>
-                )}
-              </AnimatePresence>
-
-              {/* Mobile Octagonal Book Button */}
+              {/* Mobile Book Room */}
               <button
                 type="button"
                 onClick={openMobileBooking}
-                className="absolute bottom-[22px] right-[22px] z-20 flex h-[118px] w-[118px] items-center justify-center bg-[#f8cd42] text-[14px] italic text-[#26372f] transition-transform active:scale-95 lg:hidden"
+                aria-label="Book a room"
+                className="absolute bottom-[20px] right-[22px] z-20 flex h-[118px] w-[118px] items-center justify-center text-[14px] font-medium italic text-[#26372F] transition-transform duration-300 active:scale-95 lg:hidden"
                 style={{
+                  backgroundColor: "#FCD043",
                   clipPath:
                     "polygon(30% 0%,70% 0%,100% 30%,100% 70%,70% 100%,30% 100%,0% 70%,0% 30%)",
                 }}
@@ -539,21 +642,72 @@ const Home = () => {
                 Book room
               </button>
             </div>
+
+            {/* Desktop Calendar */}
+            <AnimatePresence>
+              {activeCalendar && !mobileBookingOpen && (
+                <div
+                  className={`absolute top-[117px] z-[80] hidden lg:block ${
+                    activeCalendar === "checkIn"
+                      ? "right-[39.5%]"
+                      : "right-[19.8%]"
+                  }`}
+                >
+                  <Calendar
+                    title={
+                      activeCalendar === "checkIn"
+                        ? "Check In"
+                        : "Check Out"
+                    }
+                    selectedDate={
+                      activeCalendar === "checkIn"
+                        ? checkIn
+                        : checkOut
+                    }
+                    minimumDate={
+                      activeCalendar === "checkIn"
+                        ? today
+                        : checkIn || today
+                    }
+                    onSelect={
+                      activeCalendar === "checkIn"
+                        ? handleCheckIn
+                        : handleCheckOut
+                    }
+                    onClose={() => setActiveCalendar(null)}
+                  />
+                </div>
+              )}
+            </AnimatePresence>
           </motion.div>
 
           {/* Hero Bottom Details */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="pt-[48px] lg:pt-[76px]"
+            initial={{
+              opacity: 0,
+              y: 15,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.8,
+              delay: 0.5,
+              ease: [0.16, 1, 0.3, 1],
+            }}
+            className="pt-[48px] sm:pt-[66px] lg:pt-[76px]"
           >
-            {/* Desktop Details */}
+            {/* Desktop Bottom */}
             <div className="hidden items-end justify-between sm:flex">
               <div className="flex flex-col items-start gap-[10px]">
                 <a
                   href="tel:+380322975020"
-                  className="border-b border-[#f8cd42] pb-[1px] text-[17px] leading-none text-[#f8cd42] lg:text-[19px]"
+                  className="border-b pb-[1px] text-[17px] leading-none transition-opacity duration-300 hover:opacity-70 lg:text-[19px]"
+                  style={{
+                    color: "#FCD043",
+                    borderColor: "#FCD043",
+                  }}
                 >
                   +38 032 297 50 20
                 </a>
@@ -562,24 +716,24 @@ const Home = () => {
                   href="https://www.google.com/maps/search/?api=1&query=8+Lystopadovoho+Chynu+Lviv"
                   target="_blank"
                   rel="noreferrer"
-                  className="border-b border-white/70 pb-[2px] text-[14px] uppercase leading-none lg:text-[17px]"
+                  className="border-b border-white/70 pb-[2px] text-[14px] uppercase leading-none tracking-[-0.02em] text-[#FFFCF6] transition-colors duration-300 hover:text-[#FCD043] lg:text-[17px]"
                 >
                   8 Lystopadovoho Chynu,Lviv
                 </a>
               </div>
 
-              <p className="pb-[3px] text-right text-[16px] uppercase leading-[1.12] lg:text-[18px]">
+              <p className="text-right text-[16px] font-medium uppercase leading-[1.08] tracking-[-0.025em] text-[#FFFCF6] lg:text-[18px]">
                 Art &amp; Congress
                 <br />
-                <span className="inline-block italic">Hall</span>
+                <em className="inline-block font-normal">Hall</em>
               </p>
             </div>
 
             {/* Mobile Bottom */}
-            <p className="pb-[4px] text-[12px] font-medium uppercase leading-[1.05] sm:hidden">
+            <p className="text-[12px] font-semibold uppercase leading-[1.02] tracking-[-0.035em] text-[#D8D9D4] sm:hidden">
               Art &amp; Congress
               <br />
-              <span className="inline-block italic">Hall</span>
+              <em className="inline-block font-normal">Hall</em>
             </p>
           </motion.div>
         </div>
@@ -589,103 +743,152 @@ const Home = () => {
       <AnimatePresence>
         {mobileBookingOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[300] flex items-end bg-black/55 p-[10px] backdrop-blur-[4px] lg:hidden"
+            initial={{
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 1,
+            }}
+            exit={{
+              opacity: 0,
+            }}
+            className="fixed inset-0 z-[300] flex items-end bg-black/60 p-[10px] backdrop-blur-[5px] lg:hidden"
+            style={{
+              fontFamily: BODY_FONT,
+            }}
+            onClick={closeMobileBooking}
           >
             <motion.div
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 40, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="w-full bg-[#2f433a] p-[18px]"
+              initial={{
+                opacity: 0,
+                y: 55,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              exit={{
+                opacity: 0,
+                y: 45,
+              }}
+              transition={{
+                duration: 0.32,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              onClick={(event) => event.stopPropagation()}
+              className="max-h-[94svh] w-full overflow-y-auto bg-[#313F38] p-[18px]"
             >
-              {/* Mobile Booking Header */}
+              {/* Modal Header */}
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[10px] uppercase tracking-[0.16em] text-[#f8cd42]">
+                  <span className="block text-[10px] font-semibold uppercase tracking-[0.17em] text-[#FCD043]">
                     Reservation
                   </span>
 
-                  <h2 className="mt-[4px] text-[24px] font-medium">
+                  <h2
+                    className="mt-[5px] text-[25px] font-normal leading-none text-[#FFFCF6]"
+                    style={{
+                      fontFamily: BODY_FONT,
+                    }}
+                  >
                     Book your room
                   </h2>
                 </div>
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setMobileBookingOpen(false);
-                    setActiveCalendar(null);
-                  }}
-                  className="flex h-[38px] w-[38px] items-center justify-center border border-white/20 text-[20px]"
+                  onClick={closeMobileBooking}
+                  aria-label="Close reservation"
+                  className="flex h-[36px] w-[36px] items-center justify-center border border-white/20 text-[18px] font-light text-[#FFFCF6]"
                 >
                   ×
                 </button>
               </div>
 
-              {/* Selected Dates */}
-              <div className="mt-[18px] grid grid-cols-2 border border-white/10">
+              {/* Date Fields */}
+              <div className="mt-[21px] grid grid-cols-2 border border-white/10 pl-5">
                 <button
                   type="button"
                   onClick={() => setActiveCalendar("checkIn")}
-                  className={`min-h-[70px] border-r border-white/10 px-[15px] text-left ${
-                    activeCalendar === "checkIn" ? "bg-white/10" : ""
+                  className={`min-h-[74px] border-r border-white/10 px-[15px] text-left ${
+                    activeCalendar === "checkIn"
+                      ? "bg-white/10"
+                      : ""
                   }`}
                 >
-                  <span className="block text-[10px] uppercase text-[#f8cd42]">
+                  <span className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#FCD043]">
                     Check In
                   </span>
 
-                  <span className="mt-[6px] block text-[12px]">
-                    {checkIn ? formatDate(checkIn) : "Select date"}
+                  <span className="mt-[7px] block text-[12px] text-white/80">
+                    {checkIn
+                      ? formatDate(checkIn)
+                      : "Select date"}
                   </span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setActiveCalendar("checkOut")}
-                  className={`min-h-[70px] px-[15px] text-left ${
-                    activeCalendar === "checkOut" ? "bg-white/10" : ""
+                  className={`min-h-[74px] px-[15px] text-left ${
+                    activeCalendar === "checkOut"
+                      ? "bg-white/10"
+                      : ""
                   }`}
                 >
-                  <span className="block text-[10px] uppercase text-[#f8cd42]">
+                  <span className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#FCD043]">
                     Check Out
                   </span>
 
-                  <span className="mt-[6px] block text-[12px]">
-                    {checkOut ? formatDate(checkOut) : "Select date"}
+                  <span className="mt-[7px] block text-[12px] text-white/80">
+                    {checkOut
+                      ? formatDate(checkOut)
+                      : "Select date"}
                   </span>
                 </button>
               </div>
 
-              <div className="mt-[15px] flex justify-center">
-                <BookingCalendar
-                  title={
-                    activeCalendar === "checkOut" ? "Check Out" : "Check In"
-                  }
-                  selectedDate={
-                    activeCalendar === "checkOut" ? checkOut : checkIn
-                  }
-                  minDate={
-                    activeCalendar === "checkOut" ? checkIn || today : today
-                  }
-                  onSelect={
-                    activeCalendar === "checkOut"
-                      ? selectCheckOut
-                      : selectCheckIn
-                  }
-                  onClose={() => setActiveCalendar(null)}
-                />
-              </div>
+              {/* Calendar */}
+              <AnimatePresence mode="wait">
+                {activeCalendar && (
+                  <div className="mt-[16px] flex justify-center">
+                    <Calendar
+                      title={
+                        activeCalendar === "checkOut"
+                          ? "Check Out"
+                          : "Check In"
+                      }
+                      selectedDate={
+                        activeCalendar === "checkOut"
+                          ? checkOut
+                          : checkIn
+                      }
+                      minimumDate={
+                        activeCalendar === "checkOut"
+                          ? checkIn || today
+                          : today
+                      }
+                      onSelect={
+                        activeCalendar === "checkOut"
+                          ? handleCheckOut
+                          : handleCheckIn
+                      }
+                      onClose={() => setActiveCalendar(null)}
+                    />
+                  </div>
+                )}
+              </AnimatePresence>
 
               <button
                 type="button"
                 onClick={handleBooking}
-                className="mt-[15px] flex min-h-[58px] w-full items-center justify-center bg-[#f8cd42] text-[12px] font-semibold uppercase text-[#203129]"
+                className="mt-[17px] flex min-h-[58px] w-full items-center justify-center text-[12px] font-semibold uppercase tracking-[0.05em]"
+                style={{
+                  backgroundColor: "#FCD043",
+                  color: "#203129",
+                }}
               >
-                Confirm dates
+                Book Room
               </button>
             </motion.div>
           </motion.div>
@@ -694,59 +897,89 @@ const Home = () => {
 
       {/* Booking Confirmation Popup */}
       <AnimatePresence>
-        {bookingSuccess && (
+        {confirmationOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 1,
+            }}
+            exit={{
+              opacity: 0,
+            }}
             className="fixed inset-0 z-[400] flex items-center justify-center bg-black/60 p-[20px] backdrop-blur-[6px]"
-            onClick={() => setBookingSuccess(false)}
+            style={{
+              fontFamily: BODY_FONT,
+            }}
+            onClick={() => setConfirmationOpen(false)}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.94, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-              transition={{ duration: 0.3 }}
+              initial={{
+                opacity: 0,
+                y: 24,
+                scale: 0.95,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                scale: 1,
+              }}
+              exit={{
+                opacity: 0,
+                y: 12,
+                scale: 0.97,
+              }}
+              transition={{
+                duration: 0.32,
+                ease: [0.16, 1, 0.3, 1],
+              }}
               onClick={(event) => event.stopPropagation()}
-              className="w-full max-w-[430px] border border-white/15 bg-[#34483f] p-[28px] text-center shadow-2xl"
+              className="w-full max-w-[450px] border border-white/15 bg-[#394B42] p-[30px] text-center shadow-[0_35px_110px_rgba(0,0,0,0.42)]"
             >
               <img
                 src={starIcon}
                 alt=""
                 aria-hidden="true"
-                className="mx-auto h-[42px] w-[42px]"
+                className="mx-auto h-[44px] w-[44px]"
               />
 
-              <span className="mt-[18px] block text-[10px] font-semibold uppercase tracking-[0.18em] text-[#f8cd42]">
+              <span className="mt-[19px] block text-[10px] font-semibold uppercase tracking-[0.19em] text-[#FCD043]">
                 BankHotel
               </span>
 
-              <h2 className="mt-[8px] text-[27px] font-medium">
-                Your dates are ready
+              <h2
+                className="mt-[9px] text-[34px] font-normal leading-none text-[#FFFCF6]"
+                style={{
+                  fontFamily: HEADING_FONT,
+                }}
+              >
+                Your stay is ready
               </h2>
 
-              <p className="mx-auto mt-[12px] max-w-[330px] text-[13px] leading-[1.6] text-white/65">
-                Your stay has been selected successfully. We look forward to
-                welcoming you to BankHotel.
+              <p className="mx-auto mt-[14px] max-w-[345px] text-[13px] leading-[1.65] text-white/65">
+                Your selected dates have been saved successfully. We look
+                forward to welcoming you to BankHotel.
               </p>
 
-              <div className="mt-[23px] grid grid-cols-2 border-y border-white/10 py-[17px]">
-                <div className="border-r border-white/10">
-                  <span className="block text-[9px] uppercase tracking-[0.14em] text-[#f8cd42]">
+              {/* Selected Dates */}
+              <div className="mt-[26px] grid grid-cols-2 border-y border-white/10 py-[19px]">
+                <div className="border-r border-white/10 px-[8px]">
+                  <span className="block text-[9px] font-semibold uppercase tracking-[0.16em] text-[#FCD043]">
                     Check In
                   </span>
 
-                  <span className="mt-[6px] block text-[13px]">
+                  <span className="mt-[8px] block text-[13px] text-[#FFFCF6]">
                     {formatDate(checkIn)}
                   </span>
                 </div>
 
-                <div>
-                  <span className="block text-[9px] uppercase tracking-[0.14em] text-[#f8cd42]">
+                <div className="px-[8px]">
+                  <span className="block text-[9px] font-semibold uppercase tracking-[0.16em] text-[#FCD043]">
                     Check Out
                   </span>
 
-                  <span className="mt-[6px] block text-[13px]">
+                  <span className="mt-[8px] block text-[13px] text-[#FFFCF6]">
                     {formatDate(checkOut)}
                   </span>
                 </div>
@@ -754,8 +987,12 @@ const Home = () => {
 
               <button
                 type="button"
-                onClick={() => setBookingSuccess(false)}
-                className="mt-[24px] min-h-[54px] w-full bg-[#f8cd42] text-[12px] font-semibold uppercase text-[#203129] transition-colors hover:bg-[#ffdc5c]"
+                onClick={() => setConfirmationOpen(false)}
+                className="mt-[25px] min-h-[55px] w-full text-[12px] font-semibold uppercase tracking-[0.05em]"
+                style={{
+                  backgroundColor: "#FCD043",
+                  color: "#203129",
+                }}
               >
                 Done
               </button>
