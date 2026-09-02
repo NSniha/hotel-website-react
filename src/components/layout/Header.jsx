@@ -64,7 +64,7 @@ const Header = () => {
             href="tel:+380322975020"
             className="hidden whitespace-nowrap text-[14px] font-medium tracking-[-0.025em] transition-opacity duration-300 hover:opacity-70 xl:block 2xl:text-[15px]"
             style={{
-              color: "",
+              color: "#FCD043",
             }}
           >
             +38 032 297 50 20
