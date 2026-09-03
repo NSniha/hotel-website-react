@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 
 import Header from "../../components/layout/Header.jsx";
+import About from "./sections/About.jsx";
 
 import bankHotelLogo from "../../assets/logos/bank-hotel-logo.svg";
 import heroRoom from "../../assets/images/home/hero-room.png";
@@ -56,7 +57,6 @@ const BrandLogo = () => {
         className="block h-auto w-full"
       />
 
-      {/* Yellow Hotel Overlay */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -164,9 +164,12 @@ const Calendar = ({
             {title}
           </span>
 
-          <h3 className="mt-[6px] text-[17px] font-medium leading-none text-[#FFFCF6]" style={{
-            fontFamily: BODY_FONT,
-          }}>
+          <h3
+            className="mt-[6px] text-[17px] font-medium leading-none text-[#FFFCF6]"
+            style={{
+              fontFamily: BODY_FONT,
+            }}
+          >
             {months[visibleMonth.getMonth()]} {visibleMonth.getFullYear()}
           </h3>
         </div>
@@ -330,7 +333,9 @@ const Home = () => {
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#313F38] text-[#FFFCF6]">
-      {/* Homepage Hero */}
+      {/* ================================
+          Homepage Hero
+      ================================= */}
       <section
         id="home"
         className="relative min-h-screen bg-[#313F38] pb-[31px] sm:pb-[36px] lg:pb-[46px]"
@@ -380,7 +385,7 @@ const Home = () => {
                     delay: 0.15,
                     ease: [0.16, 1, 0.3, 1],
                   }}
-                  className="pt-[25px] whitespace-nowrap text-center text-[10px] font-semibold uppercase leading-none tracking-[-0.04em] text-[#FCD043] min-[370px]:text-[11px] sm:text-[14px] lg:pt-[25px] lg:text-left lg:text-[17px]"
+                  className="whitespace-nowrap pt-[25px] text-center text-[10px] font-semibold uppercase leading-none tracking-[-0.04em] text-[#FCD043] min-[370px]:text-[11px] sm:text-[14px] lg:pt-[25px] lg:text-left lg:text-[17px]"
                 >
                   Rooms // Restaurant // Congress Hall // Wine Bar
                 </motion.p>
@@ -739,7 +744,25 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Mobile Booking Modal */}
+      {/* ================================
+          Homepage Sections
+      ================================= */}
+
+      <About />
+
+      {/*
+        Future sections will be added here:
+
+        <Rooms />
+        <Facilities />
+        <Restaurant />
+        <Gallery />
+        <Contact />
+      */}
+
+      {/* ================================
+          Mobile Booking Modal
+      ================================= */}
       <AnimatePresence>
         {mobileBookingOpen && (
           <motion.div
@@ -895,7 +918,9 @@ const Home = () => {
         )}
       </AnimatePresence>
 
-      {/* Booking Confirmation Popup */}
+      {/* ================================
+          Booking Confirmation Popup
+      ================================= */}
       <AnimatePresence>
         {confirmationOpen && (
           <motion.div
